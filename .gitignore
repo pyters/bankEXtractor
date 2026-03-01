@@ -1,0 +1,33 @@
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data & Output Files
+*.xlsx
+*.csv
+*.xls
+
+# Test PDFs & Sensitive Data
+tests/pdfs/
+tests/pdf/
+*.pdf
+
+# IDEs & System Files
+.vscode/
+.idea/
+.DS_Store
+.env
+
+# Tooling
+.ipynb_checkpoints/
+temp_debugger.py
+temp_debugger2.py
+test_*_module.py
+investigate_all.py
+orchestrator.py
