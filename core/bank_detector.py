@@ -28,20 +28,25 @@ def detect_bank(filepath: str) -> str:
             if "total disponível" in text and "agência | conta" in text:
                 return "bradesco"
                 
-            if "sicredi" in text or ("cooperativa:" in text and "conta:" in text and "saldo anterior" in text):
+            # Nubank deve vir ANTES de Sicredi/Acredicoop — o PDF do Nubank pode conter
+            # a palavra 'sicredi' ou 'acredi' no corpo das transações (ex: transferência para Sicredi).
+            # 'total de entradas' + 'total de saídas' são exclusivos do layout Nubank PJ.
+            if "nubank" in text or "nu pagamentos" in text or ("total de entradas" in text and "total de saídas" in text):
+                return "nubank"
+
+            # Acredicoop deve vir ANTES do Sicredi — ambos têm 'cooperativa' e 'conta' no texto
+            if "acredicoop" in text or "acredi" in text:
+                return "acredicoop"
+
+            # Sicredi: exige a palavra 'sicredi' explicitamente para não confundir com outros bancos
+            if "sicredi" in text:
                 return "sicredi"
                 
             if "instituição: banco inter" in text or "banco inter" in text:
                 return "inter"
-            
-            if "nubank" in text.lower() or "nu pagamentos" in text.lower() or "nu bank" in text.lower() or "total de entradas" in text:
-                return "nubank"
                 
-            if "asaas" in text.lower() or "data movimentações valor" in text.lower():
+            if "asaas" in text or "data movimentações valor" in text:
                 return "asaas"
-                
-            if "acredicoop" in text.lower() or "acredi" in text.lower() and "cooperativa" in text.lower():
-                return "acredicoop"
                 
     except Exception as e:
         print(f"Erro ao ler PDF para identificação: {e}")
