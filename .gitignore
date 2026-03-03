@@ -12,6 +12,7 @@ __pycache__/
 *.xlsx
 *.csv
 *.xls
+analytics.db
 
 # Test PDFs & Sensitive Data
 tests/pdfs/

@@ -6,6 +6,10 @@ import io
 
 from core.bank_detector import detect_bank
 from banks.btg import BtgBank
+from core.analytics import init_db, log_event, get_analytics_data
+
+# Inicializa o banco de analytics
+init_db()
 
 st.set_page_config(page_title="Joicont PDF -> Excel", page_icon="📄", layout="centered")
 
@@ -58,7 +62,7 @@ with st.sidebar:
     st.title("📂 Navegação")
     pagina = st.radio(
         "Ir para:",
-        ["🚀 Processar", "🏦 Bancos Suportados", "📖 Como Usar", "ℹ️ Sobre"],
+        ["🚀 Processar", "📊 Analytics", "🏦 Bancos Suportados", "📖 Como Usar", "ℹ️ Sobre"],
         label_visibility="collapsed"
     )
 
@@ -83,6 +87,7 @@ if pagina == "🚀 Processar":
                 
                 if bank_id == "unknown":
                     st.error("Ops! Não consegui identificar qual banco é este PDF. É possível que não seja suportado ainda.")
+                    log_event(uploaded_file.name, "Desconhecido", "erro", 0, "Banco não identificado")
                 else:
                     st.success(f"Banco identificado: **{bank_id.upper()}**")
                     
@@ -136,15 +141,74 @@ if pagina == "🚀 Processar":
                                 file_name=f"Extrato_{bank_id.upper()}_Formatado.xlsx",
                                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                             )
+                            log_event(uploaded_file.name, bank_id, "sucesso", len(df_resultado))
                     else:
                         st.error(f"Extrator para o banco {bank_id} ainda não foi implementado!")
+                        log_event(uploaded_file.name, bank_id, "erro", 0, "Extrator não implementado")
                         
             except Exception as e:
                 st.error(f"Ocorreu um erro durante a extração: {str(e)}")
+                log_event(uploaded_file.name, bank_id if 'bank_id' in locals() else "Erro", "erro", 0, str(e))
                 
             finally:
                 if os.path.exists(tmp_path):
                     os.unlink(tmp_path)
+
+# --- Página: Analytics ---
+elif pagina == "📊 Analytics":
+    st.title("📊 Dashboard de Analytics")
+    
+    df_logs = get_analytics_data()
+    
+    if df_logs.empty:
+        st.info("Ainda não há dados processados para exibir analytics.")
+    else:
+        # Métricas em colunas
+        col1, col2, col3 = st.columns(3)
+        total_files = len(df_logs)
+        total_rows = df_logs['row_count'].sum()
+        errors = len(df_logs[df_logs['status'] == 'erro'])
+        
+        with col1:
+            st.metric("Arquivos Processados", total_files)
+        with col2:
+            st.metric("Total de Lançamentos", f"{total_rows:,}".replace(",", "."))
+        with col3:
+            st.metric("Erros/Não Identificados", errors, delta_color="inverse")
+        
+        st.divider()
+        
+        # Gráficos e Tabelas
+        tab1, tab2 = st.tabs(["📈 Gráficos", "📋 Log Detalhado"])
+        
+        with tab1:
+            col_chart1, col_chart2 = st.columns(2)
+            
+            with col_chart1:
+                st.subheader("Bancos Detectados")
+                bank_counts = df_logs[df_logs['bank'] != 'Desconhecido']['bank'].value_counts()
+                if not bank_counts.empty:
+                    st.bar_chart(bank_counts)
+                else:
+                    st.write("Sem dados de bancos para exibir.")
+            
+            with col_chart2:
+                st.subheader("Status dos Processamentos")
+                status_counts = df_logs['status'].value_counts()
+                st.bar_chart(status_counts)
+
+        with tab2:
+            st.subheader("Histórico de Uploads")
+            # Traduzindo status para emoji/texto amigável
+            def format_status(val):
+                color = 'green' if val == 'sucesso' else 'red'
+                return f'background-color: {color}'
+            
+            st.dataframe(
+                df_logs[['timestamp', 'filename', 'bank', 'status', 'row_count', 'error_message']],
+                use_container_width=True,
+                hide_index=True
+            )
 
 # --- Página: Bancos Suportados ---
 elif pagina == "🏦 Bancos Suportados":
@@ -200,7 +264,20 @@ elif pagina == "ℹ️ Sobre":
     
     ---
     ### Detalhes do Software
-    - **Versão:** 0.1
-    - **Data de Release:** 02 de Março de 2026
-    - **Status:** Beta (Piloto)
+    - **Versão:** 0.2
+    - **Data da Última Atualização:** 03 de Março de 2026
+    - **Status:** Beta (Testes Ativos)
+    
+    ---
+    ### 📜 Histórico de Versões
+    
+    #### [v0.2] - 03/03/2026
+    - **Analytics Dashboard**: Implementação de sistema de logs com SQLite.
+    - **Métricas de Uso**: Contador de transações, arquivos e taxa de erro.
+    - **Persistência**: Os dados agora são salvos no servidor para análise futura.
+    
+    #### [v0.1] - 02/03/2026
+    - **Lançamento Inicial**: Suporte para 8 bancos (BTG, BB, Bradesco, Sicredi, Inter, Nubank, Asaas, Acredicoop).
+    - **Detecção Automática**: Motor de identificação de bancos baseado em texto.
+    - **Exportação Excel**: Conversão direta para o formato compatível com sistemas contábeis.
     """)
