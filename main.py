@@ -116,6 +116,9 @@ if pagina == "🚀 Processar":
                     elif bank_id == "acredicoop":
                         from banks.acredicoop import AcredicoopBank
                         extractor = AcredicoopBank()
+                    elif bank_id == "stone":
+                        from banks.stone import StoneBank
+                        extractor = StoneBank()
 
                     if extractor:
                         # 3. Extrai os dados em DataFrame
@@ -226,6 +229,7 @@ elif pagina == "🏦 Bancos Suportados":
     | Nubank PJ | Regex Lookahead |
     | Asaas | Regex Invertida |
     | Acredicoop | Regex por Colunas |
+    | Stone | Regex Multilinha |
 
     *Trabalhamos constantemente para adicionar novas instituições.*
     """)
@@ -264,12 +268,16 @@ elif pagina == "ℹ️ Sobre":
     
     ---
     ### Detalhes do Software
-    - **Versão:** 0.2
-    - **Data da Última Atualização:** 03 de Março de 2026
-    - **Status:** Beta (Testes Ativos)
+    - **Versão:** 0.3
+    - **Data da Última Atualização:** 11 de Março de 2026
+    - **Status:** Produção e Online
     
     ---
     ### 📜 Histórico de Versões
+    
+    #### [v0.3] - 11/03/2026
+    - **Analytics na Nuvem**: Migração do banco de logs para a plataforma Supabase. O banco de dados passa a ser persistente, permitindo reinícios sem perda do histórico.
+    - **Novos Bancos**: Adição de suporte ao formato da *Stone Instituição de Pagamento*.
     
     #### [v0.2] - 03/03/2026
     - **Analytics Dashboard**: Implementação de sistema de logs com SQLite.

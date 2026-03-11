@@ -32,3 +32,6 @@ temp_debugger2.py
 test_*_module.py
 investigate_all.py
 orchestrator.py
+
+# Streamlit config
+.streamlit/secrets.toml

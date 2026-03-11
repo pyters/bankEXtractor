@@ -12,9 +12,10 @@
 - [x] Bradesco
 - [x] Sicredi
 - [x] Banco Inter
-- [x] Nubank PJ
+- [x] Nu Bank (PJ)
 - [x] Asaas
-- [x] Acredicoop
+- [x] Cooperativa Acredi (Acredicoop)
+- [x] Stone Instituição de Pagamento
 
 ---
 
@@ -61,5 +62,10 @@ Durante o processamento, o `bank_detector.py` faz um scanner textual (`page.extr
 
 - **Identificação**: Check antes da Sicredi. Keyword scan para `acredicoop` ou `acredi`.
 - **Extração (`banks/acredicoop.py`)**: Regex flat com base no layout transacional padronizado na ordem Data > Descrição > Documento > Valor > Saldo.
+
+### Stone Instituição de Pagamento
+
+- **Identificação**: Keyword scan para `stone instituição de pagamento` ou `stone`.
+- **Extração (`banks/stone.py`)**: Regex Multilinha. Extrai o bloco de transação com base na linha de data e valor, buscando descrições na linha anterior ou posterior dependendo da orientação financeira.
 
 ---

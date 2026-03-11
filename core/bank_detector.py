@@ -48,6 +48,9 @@ def detect_bank(filepath: str) -> str:
             if "asaas" in text or "data movimentações valor" in text:
                 return "asaas"
                 
+            if "stone instituição de pagamento" in text or "stone" in text:
+                return "stone"
+                
     except Exception as e:
         print(f"Erro ao ler PDF para identificação: {e}")
         

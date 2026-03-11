@@ -14,6 +14,7 @@ Atualmente, o projeto suporta a extração dos seguintes bancos:
 - ✅ **Nubank PJ** (Regex Lookahead Contextual)
 - ✅ **Asaas** (Regex Inversa por sufixo de valor)
 - ✅ **Acredicoop** (Regex Flat de 5 colunas)
+- ✅ **Stone** (Regex Multilinha)
 
 ## 🛠️ Tecnologias Utilizadas
 - **Python 3.12+**
@@ -21,6 +22,7 @@ Atualmente, o projeto suporta a extração dos seguintes bancos:
 - **pdfplumber**: Motor de extração de dados de PDFs.
 - **Pandas**: Manipulação e estruturação de dados.
 - **Openpyxl**: Engine para geração de arquivos Excel.
+- **Supabase**: Analytics e persistência na nuvem.
 
 ## 📦 Como Instalar e Rodar
 
